@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block sidebar %}
+{% if perms.auth.is_admin %}
+{% include "admin/components/sidebar.html" %}
+{% elif perms.auth.is_alumnus %}
+{% include "alumni/components/sidebar.html" %}
+{% elif perms.auth.is_student %}
+{% include "student/components/sidebar.html" %}
+{% endif %}
+{% endblock %}
+
+{% block searchbar %}
+{% include 'student/components/searchbar.html' %}
+{% endblock %}
+{% block content %}
+<main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+  <h1 class="mt-5 h2">Student List</h1>
+  <div class="mt-5">
+    <table class="mt-4 table table-bordered border-dark">
+      <thead class="table-dark">
+        <tr>
+          {% if perms.auth.is_admin %}
+          <th scope="col">Sl.No</th>
+          {% endif %}
+          <th scope="col">SAP ID</th>
+          <th scope="col">USN</th>
+          <th scope="col">NAME</th>
+          <th scope="col">CONTACT NUMBER</th>
+          <th scope="col">RV EMAIL ID</th>
+          <th scope="col">PERSONAL EMAIL ID</th>
+          {% if perms.auth.is_admin %}
+          <th></th>
+          {% endif %}
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in students%}
+        <tr>
+          {% if perms.auth.is_admin %}
+          <th scope="row">{{item.user.pk}}</th>
+          {% endif %}
+          <td>{{item.sap_id}}</td>
+          <td>{{item.usn}}</td>
+          <td>{{item.name}}</td>
+          <td>{{item.phone}}</td>
+          <td>{{item.email}}</td>
+          <td>{{item.personal_email}}</td>
+          {% if perms.auth.is_admin %}
+          <td>
+            <form action="{% url 'delete_student' pk=item.user.pk %}" method="post">
+              {% csrf_token %}
+              <button class="btn-danger btn-lg border-0 rounded-pill delete" type="submit" value="Delete"><span data-feather="trash-2"></span></button>
+            </form>
+          </td>
+          {% endif %}
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</main>
+{% endblock %}

@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block searchbar %}
+{% include 'alumni/components/searchbar.html' %}
+{% endblock %}
+
+{% block sidebar %}
+{% if perms.auth.is_admin %}
+{% include "admin/components/sidebar.html" %}
+{% elif perms.auth.is_alumnus %}
+{% include "alumni/components/sidebar.html" %}
+{% elif perms.auth.is_student %}
+{% include "student/components/sidebar.html" %}
+{% endif %}
+{% endblock %}
+
+{% block content %}
+<main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+    <h1 class="mt-5 h2">Alumni List</h1>
+    <div class="mt-5">
+        <table class="mt-4 table table-bordered border-dark">
+            <thead class="table-dark">
+                <tr>
+                    {% if perms.auth.is_admin %}
+                    <th scope="col">ID</th>
+                    {% endif %}
+                    <th scope="col">USN</th>
+                    <th scope="col">Name</th>
+                    <th scope="col">Phone</th>
+                    <th scope="col">Email</th>
+                    <th scope="col">RV Email</th>
+                    <th scope="col">Studied</th>
+                    <th scope="col">Company</th>
+                    <th scope="col">CTC</th>
+                    <th scope="col">Role</th>
+                    <th scope="col">Type</th>
+                    {% if perms.auth.is_admin %}
+                    <th></th>
+                    {% endif %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in alumni %}
+                <tr>
+                    {% if perms.auth.is_admin %}
+                    <td>{{item.user.pk}}</td>
+                    {% endif %}
+                    <td>{{item.usn}}</td>
+                    <td>{{item.name}}</td>
+                    <td>{{item.phone}}</td>
+                    <td>{{item.personal_email}}</td>
+                    <td>{{item.email}}</td>
+                    <td>{{item.year_joined.year}} - {{item.year_passed.year}}</td>
+                    <td>{{item.placements.company_name}}</td>
+                    <td>{{item.placements.ctc}}</td>
+                    <td>{{item.placements.job_profile}}</td>
+                    <td>{{item.placements.type}}</td>
+                    {% if perms.auth.is_admin %}
+                    <td>
+                        <form action="{% url 'delete_alumni' pk=item.user.pk %}" method="post">
+                            {% csrf_token %}
+                            <button class="btn-danger btn-lg border-0 rounded-pill delete" type="submit" value="Delete">
+                                <span data-feather="trash-2"></span></button>
+                        </form>
+                    </td>
+                    {% endif %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</main>
+{% endblock %}
